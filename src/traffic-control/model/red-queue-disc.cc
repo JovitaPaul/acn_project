@@ -134,7 +134,7 @@ RedQueueDisc::GetTypeId()
                           DoubleValue(50),
                           MakeDoubleAccessor(&RedQueueDisc::m_lInterm),
                           MakeDoubleChecker<double>())
-            .AddAttribute("TargetDelay",
+            .AddAttribute("TargetQueueDelay",
                           "Target average queuing delay in ARED",
                           TimeValue(Seconds(0.005)),
                           MakeTimeAccessor(&RedQueueDisc::m_targetQueueDelay),
