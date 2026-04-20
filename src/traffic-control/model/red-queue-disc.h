@@ -221,14 +221,14 @@ class RedQueueDisc : public QueueDisc
     double Estimator(uint32_t Current_queue_len, uint32_t m, double qAvg, double wQ);
     /**
      * @brief Update m_curMaxP
-     * @param newAve new average queue length
+     * @param newAvg new average queue length
      */
-    void UpdateMaxP(double newAve);
+    void UpdateMaxP(double newAvg);
     /**
      * @brief Update m_curMaxP based on Feng's Adaptive RED
-     * @param newAve new average queue length
+     * @param newAvg new average queue length
      */
-    void UpdateMaxPFeng(double newAve);
+    void UpdateMaxPFeng(double newAvg);
     /**
      * @brief Check if a packet needs to be dropped due to probability mark
      * @param item queue item
