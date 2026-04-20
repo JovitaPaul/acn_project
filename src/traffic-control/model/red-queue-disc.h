@@ -214,11 +214,11 @@ class RedQueueDisc : public QueueDisc
      * @brief Compute the average queue size
      * @param Current_queue_len number of queued packets
      * @param m simulated number of packets arrival during idle period
-     * @param qAvg average queue size
+     * @param oldavg average queue size
      * @param wQ queue weight given to cur q size sample
      * @returns new average queue size
      */
-    double Estimator(uint32_t Current_queue_len, uint32_t m, double qAvg, double wQ);
+    double Estimator(uint32_t Current_queue_len, uint32_t m, double oldavg, double wQ);
     /**
      * @brief Update m_curMaxP
      * @param newAvg new average queue length
