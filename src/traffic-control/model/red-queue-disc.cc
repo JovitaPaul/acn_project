@@ -115,7 +115,7 @@ RedQueueDisc::GetTypeId()
             .AddAttribute("MaxQueueSize",
                           "The maximum number of packets accepted by this queue disc",
                           QueueSizeValue(QueueSize("25p")),
-                          MakeQueueSizeAccessor(&QueueDisc::SetMaxQueueSize, &QueueDisc::GetMaxQueueSize),
+                          MakeQueueSizeAccessor(&QueueDisc::SetMaxSize, &QueueDisc::GetMaxSize),
                           MakeQueueSizeChecker())
             /* ---------------------------------------------------------------
              * EWMA weight
@@ -423,7 +423,7 @@ RedQueueDisc::DoEnqueue(Ptr<QueueDiscItem> item)
 {
     NS_LOG_FUNCTION(this << item);
     // Instantaneous queue length q at the moment of arrival
-    uint32_t Current_queue_len = GetInternalQueue(0)->GetCurrentSize().GetValue();
+    uint32_t currQLen = GetInternalQueue(0)->GetCurrentSize().GetValue();
     /* 
      * Idle-period compensation
      *
@@ -459,7 +459,7 @@ RedQueueDisc::DoEnqueue(Ptr<QueueDiscItem> item)
      *   g_qAvg = (1 - w_q)^(m+1) * g_qAvg + w_q * qLen
      * Estimator() also triggers ARED/Feng g_curMaxP updates if applicable.
     */
-    m_qAvg = Estimator(Current_queue_len, m + 1, m_qAvg, m_wQ);
+    m_qAvg = Estimator(currQLen, m + 1, m_qAvg, m_wQ);
 
     NS_LOG_DEBUG("\t bytesInQueue  " << GetInternalQueue(0)->GetNBytes() << "\tQavg " << m_qAvg);
     NS_LOG_DEBUG("\t packetsInQueue  " << GetInternalQueue(0)->GetNPackets() << "\tQavg "<< m_qAvg);
@@ -471,7 +471,7 @@ RedQueueDisc::DoEnqueue(Ptr<QueueDiscItem> item)
     
     uint32_t dropType = DTYPE_NONE;
 
-    if (m_qAvg >= m_minTh && Current_queue_len > 1)
+    if (m_qAvg >= m_minTh && currQLen > 1)
     {
         // Forced-drop zone: average is above the upper threshold
         if ((!m_isGentle && m_qAvg >= m_maxTh) || (m_isGentle && m_qAvg >= 2 * m_maxTh))
@@ -492,7 +492,7 @@ RedQueueDisc::DoEnqueue(Ptr<QueueDiscItem> item)
             m_countBytes = item->GetSize();
             m_aboveMinTh = 1;
         }
-        else if (DropEarly(item, Current_queue_len))
+        else if (DropEarly(item, currQLen))
         {
             // Probabilistic drop based on p_a from CalculatePNew()+ModifyP()
             NS_LOG_LOGIC("DropEarly returns 1");
@@ -621,7 +621,7 @@ RedQueueDisc::InitializeParams()
         }
 
         // Convert threshold to bytes if the queue is measured in bytes
-        if (GetMaxQueueSize().GetUnit() == QueueSizeUnit::BYTES)
+        if (GetMaxSize().GetUnit() == QueueSizeUnit::BYTES)
         {
             m_minTh = m_minTh * m_meanPktSize;
         }
@@ -778,12 +778,12 @@ RedQueueDisc::UpdateMaxP(double newAvg)
 
 // Compute the average queue size
 double
-RedQueueDisc::Estimator(uint32_t Current_queue_len, uint32_t m, double oldAvg, double qW)
+RedQueueDisc::Estimator(uint32_t currQLen, uint32_t m, double oldAvg, double qW)
 {
-    NS_LOG_FUNCTION(this << Current_queue_len << m << oldAvg << qW);
+    NS_LOG_FUNCTION(this << currQLen << m << oldAvg << qW);
 
     double newAvg = oldAvg * std::pow(1.0 - qW, m);
-    newAvg += qW * Current_queue_len;
+    newAvg += qW * currQLen;
 
     Time now = Simulator::Now();
     if (m_isAdaptMaxP && now > m_lastSet_currMaxP_At + m_interval)
@@ -913,7 +913,7 @@ RedQueueDisc::ModifyP(double Pd, uint32_t size)
     NS_LOG_FUNCTION(this << Pd << size);
     auto count1 = (double)m_count;
 
-    if (GetMaxQueueSize().GetUnit() == QueueSizeUnit::BYTES)
+    if (GetMaxSize().GetUnit() == QueueSizeUnit::BYTES)
     {
         count1 = (double)(m_countBytes / m_meanPktSize);
     }
@@ -945,7 +945,7 @@ RedQueueDisc::ModifyP(double Pd, uint32_t size)
         }
     }
 
-    if ((GetMaxQueueSize().GetUnit() == QueueSizeUnit::BYTES) && (Pd < 1.0))
+    if ((GetMaxSize().GetUnit() == QueueSizeUnit::BYTES) && (Pd < 1.0))
     {
         Pd = (Pd * size) / m_meanPktSize;
     }
@@ -1029,7 +1029,7 @@ RedQueueDisc::CheckConfig()
     {
         // add a DropTail queue
         AddInternalQueue(
-            CreateObjectWithAttributes<DropTailQueue<QueueDiscItem>>("MaxQueueSize",QueueSizeValue(GetMaxQueueSize())));
+            CreateObjectWithAttributes<DropTailQueue<QueueDiscItem>>("MaxQueueSize",QueueSizeValue(GetMaxSize())));
     }
 
     if (GetNInternalQueues() != 1)
