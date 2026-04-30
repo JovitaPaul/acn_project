@@ -213,8 +213,8 @@ class RedQueueDisc : public QueueDisc
     bool m_isAdaptMaxP;       //!< True to adapt m_curMaxP
     double m_minTh;           //!< Minimum threshold for m_qAvg (bytes or packets)
     double m_maxTh;           //!< Maximum threshold for m_qAvg (bytes or packets), should be >= 2 * m_minTh
-    double m_wQ;              //!< Queue weight given to cur queue size sample
-    double m_lInterm;         //!< The max probability of dropping a packet
+    double m_qWeight;         //!< Queue weight given to cur queue size sample (This is same as Wq)
+    double m_lInterm;         //!< The max probability of dropping a packet 
     bool m_isFengAdaptive;    //!< True to enable Feng's Adaptive RED
     bool m_isNonlinear;       //!< True to enable Nonlinear RED
     bool m_isNs1Compat;       //!< Ns-1 compatibility
@@ -223,7 +223,7 @@ class RedQueueDisc : public QueueDisc
     bool m_useEcn;            //!< True if ECN is used (packets are marked instead of being dropped)
     bool m_useHardDrop;       //!< True if packets are always dropped above max threshold
 
-    // ** Variables maintained by Classic RED
+    // ** Variables maintained by RED
     double m_vA;             //!< 1.0 / (m_maxTh - m_minTh)
     double m_vB;             //!< -m_minTh / (m_maxTh - m_minTh)
     double m_curMaxP;        //!< Current max_p
@@ -240,7 +240,7 @@ class RedQueueDisc : public QueueDisc
      * 2 experimental (see red-queue-disc.cc)
      * 3 use Idle packet size in the ptc
      */
-    uint32_t m_dropCautionMode;
+    uint32_t m_cautionMode;
     Time m_idleTime;         //!< Start of current idle period
 
     // ** Variables maintained by Gentle RED
@@ -257,15 +257,15 @@ class RedQueueDisc : public QueueDisc
     FengStatus m_fengStatus; //!< Tracks queue state (Above / Between / Below thresholds)
 
     // ** Variables maintained by Adaptive RED (ARED)
-    Time m_targetQueueDelay;    //!< Target average queuing delay in ARED
+    Time m_targetQDelay;    //!< Target average queuing delay in ARED
     Time m_interval;            //!< Time interval to update m_curMaxP
     double m_minCurMaxP;         //!< Lower bound for m_curMaxP in ARED
     double m_aredAlpha;         //!< Increment parameter for m_curMaxP in ARED
     double m_aredBeta;          //!< Decrement parameter for m_curMaxP in ARED
-    Time m_rtt;                 //!< RTT used when auto-setting m_lbCurMaxP in ARED
-    Time m_lastSet_currMaxP_At; //!< Last time m_curMaxP was updated
+    Time m_rtt;                 //!< RTT used when auto-setting m_minCurMaxP in ARED
+    Time m_lastSet; //!< Last time m_curMaxP was updated
 
-    Ptr<UniformRandomVariable> m_uv; //!< rng stream
+    Ptr<UniformRandomVariable> m_uv; //!< random number generator stream
 };
 
 }; // namespace ns3
