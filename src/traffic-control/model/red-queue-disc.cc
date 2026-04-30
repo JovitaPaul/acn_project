@@ -68,9 +68,9 @@ RedQueueDisc::GetTypeId()
             .SetGroupName("TrafficControl")
             .AddConstructor<RedQueueDisc>()
             
-            /*---------------------------------------------------------------
+            /*
              * Packet sizing and link characterisation
-             * ---------------------------------------------------------------
+             * 
             */
             .AddAttribute("MeanPktSize",
                           "Average of packet size",
@@ -97,9 +97,9 @@ RedQueueDisc::GetTypeId()
                           MakeTimeAccessor(&RedQueueDisc::m_linkDelay),
                           MakeTimeChecker())
 
-            /* ---------------------------------------------------------------
+            /* 
              * Queue thresholds
-             * ---------------------------------------------------------------
+             * 
             */
              .AddAttribute("MinTh",
                           "Minimum average length threshold in packets/bytes",
@@ -118,27 +118,27 @@ RedQueueDisc::GetTypeId()
                           QueueSizeValue(QueueSize("25p")),
                           MakeQueueSizeAccessor(&QueueDisc::SetMaxSize, &QueueDisc::GetMaxSize),
                           MakeQueueSizeChecker())
-            /* ---------------------------------------------------------------
+            /* 
              * EWMA weight
-             *  ---------------------------------------------------------------
+             *  
             */
             .AddAttribute("QWeight",
                           "Queue weight related to the exponential weighted moving average (EWMA)",
                           DoubleValue(0.002),
                           MakeDoubleAccessor(&RedQueueDisc::m_qWeight),
                           MakeDoubleChecker<double>())
-            /* ---------------------------------------------------------------
+            /* 
              * Drop probability
-             * ---------------------------------------------------------------
+             * 
             */
             .AddAttribute("LInterm",
                           "The maximum probability of dropping a packet",
                           DoubleValue(50),
                           MakeDoubleAccessor(&RedQueueDisc::m_lInterm),
                           MakeDoubleChecker<double>())
-            /* ---------------------------------------------------------------
+            /* 
              * Behavioural flags
-             * ---------------------------------------------------------------
+             * 
             */
             .AddAttribute("WaitBetweenDrops",
                           "True for waiting between dropped packets",
@@ -159,9 +159,9 @@ RedQueueDisc::GetTypeId()
                           MakeBooleanAccessor(&RedQueueDisc::m_isNs1Compat),
                           MakeBooleanChecker())
 
-            /* ---------------------------------------------------------------
+            /* 
              * Adaptive RED (ARED)
-             *  ---------------------------------------------------------------
+             *  
             */
             .AddAttribute("ARED",
                           "True to enable ARED",
@@ -216,9 +216,9 @@ RedQueueDisc::GetTypeId()
                           TimeValue(Seconds(0.1)),
                           MakeTimeAccessor(&RedQueueDisc::m_rtt),
                           MakeTimeChecker()) 
-            /* ---------------------------------------------------------------
+            /* 
              * Feng's Adaptive RED
-             * ---------------------------------------------------------------
+             * 
             */
             .AddAttribute("FengAdaptive",
                           "True to enable Feng's Adaptive RED",
@@ -237,9 +237,9 @@ RedQueueDisc::GetTypeId()
                           DoubleValue(2.0),
                           MakeDoubleAccessor(&RedQueueDisc::SetFengAdaptiveB),
                           MakeDoubleChecker<double>())
-            /* ---------------------------------------------------------------
+            /* 
              * Nonlinear RED  [NLRED]
-             * ---------------------------------------------------------------
+             * 
             */
             .AddAttribute("NLRED",
                           "True to enable Nonlinear RED",
@@ -249,9 +249,9 @@ RedQueueDisc::GetTypeId()
 
             
 
-            /* ---------------------------------------------------------------
+            /* 
              * ECN support
-             * ---------------------------------------------------------------
+             * 
             */
             .AddAttribute("UseEcn",
                           "True to use ECN (packets are marked instead of being dropped)",
@@ -268,9 +268,8 @@ RedQueueDisc::GetTypeId()
     return tid;
 }
 
-/* ---------------------------------------------------------------------------
+/*
  * Constructor / Destructor
- * ---------------------------------------------------------------------------
 */
 
 RedQueueDisc::RedQueueDisc()
@@ -294,6 +293,7 @@ Returns: None
 Return Type: void
 -----------------------------------------------------------------------------------------
 */
+
 void
 RedQueueDisc::DoDispose()
 {
@@ -302,9 +302,9 @@ RedQueueDisc::DoDispose()
     QueueDisc::DoDispose();
 }
 
-/* ---------------------------------------------------------------------------
+/* 
  * ARED alpha/beta setters
- * ---------------------------------------------------------------------------
+ * 
 */
 
 void
@@ -354,9 +354,9 @@ RedQueueDisc::GetAredBeta()
     return m_aredBeta;
 }
 
-/* ---------------------------------------------------------------------------
+/* 
  * Feng alpha/beta setters
- * ---------------------------------------------------------------------------
+ * 
 */
 void
 RedQueueDisc::SetFengAdaptiveA(double a)
@@ -404,16 +404,12 @@ RedQueueDisc::GetFengAdaptiveB()
     return m_fengBeta;
 }
 
-/*
------------------------------------------------------------------------------------------
-Function: SetTh
-Description: Sets the minimum and maximum average queue length thresholds
-Parameters: minTh - lower queue average threshold in bytes or packets
-            maxTh - upper queue average threshold in bytes or packets
-Returns: None
-Return Type: void
------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Sets the minimum and maximum average queue length thresholds.
+ * 
+ * @param minTh Lower queue average threshold in bytes or packets.
+ * @param maxTh Upper queue average threshold in bytes or packets.
+ */
 void
 RedQueueDisc::SetTh(double minTh, double maxTh)
 {
@@ -423,15 +419,13 @@ RedQueueDisc::SetTh(double minTh, double maxTh)
     m_maxTh = maxTh;
 }
 
-/*
-------------------------------------------------------------------------------------------
-Function: AssignStreams
-Description: Binds the internal uniform random variable to a fixed stream index for reproducible simulations.
-Parameters: stream - first stream index to assign
-Returns: number of stream indices consumed (always 1)
-Return Type: int64_t
------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Binds the internal uniform random variable to a fixed stream index for reproducible simulations.
+ *
+ * @param stream First stream index to assign.
+ *
+ * @return Number of stream indices consumed (always 1).
+ */
 int64_t
 RedQueueDisc::AssignStreams(int64_t stream)
 {
@@ -440,15 +434,17 @@ RedQueueDisc::AssignStreams(int64_t stream)
     return 1;
 }
 
-/*-----------------------------------------------------------------------
- * Function: DoEnqueue
- * Description: Processes an incoming packet using the RED algorithm.
- *              Computes average queue length (EWMA), determines drop type
- *              (none, probabilistic, or forced), and either drops, ECN
- *              marks, or enqueues the packet into the internal queue.
- * Parameters: Ptr<QueueDiscItem> item
- * Return Type: bool
- *-----------------------------------------------------------------------*/
+/**
+ * @brief Processes an incoming packet using the RED algorithm.
+ *
+ * Computes average queue length (EWMA), determines drop type
+ * (none, probabilistic, or forced), and either drops, ECN
+ * marks, or enqueues the packet into the internal queue.
+ *
+ * @param item Pointer to the queue disc item to enqueue.
+ *
+ * @return True if the packet was successfully enqueued, false if dropped.
+ */
 bool
 RedQueueDisc::DoEnqueue(Ptr<QueueDiscItem> item)
 {
@@ -570,16 +566,13 @@ RedQueueDisc::DoEnqueue(Ptr<QueueDiscItem> item)
 }
 
 
-/*-----------------------------------------------------------------------
- * Function: InitializeParams
- * Description: Initializes RED queue parameters and derives all computed
- *              values from configured attributes. Handles ARED and Feng
- *              adaptive modes, sets thresholds, weights, and packet
- *              transmission capacity before the simulation starts.
- * Parameters: None
- * Return Type: void
- *-----------------------------------------------------------------------
-*/
+/**
+ * @brief Initializes RED queue parameters and derives all computed values from configured attributes.
+ *
+ * Handles ARED and Feng adaptive modes, sets thresholds, weights, and packet
+ * transmission capacity before the simulation starts.
+ */
+
 void
 RedQueueDisc::InitializeParams()
 {
@@ -743,15 +736,11 @@ RedQueueDisc::InitializeParams()
     NS_LOG_DEBUG("\t m_delay " << m_linkDelay.GetSeconds() << "; m_isWait " << m_isWait << "; m_qW "<< m_qWeight << "; m_ptc " << m_ptc << "; m_minTh " << m_minTh<< "; m_maxTh " << m_maxTh << "; m_isGentle " << m_isGentle<< "; th_diff " << th_diff << "; lInterm " << m_lInterm << "; va "<< m_vA << "; cur_max_p " << m_curMaxP << "; v_b " << m_vB<< "; m_vC " << m_vC << "; m_vD " << m_vD);
 }
 
-/*
--------------------------------------------------------------------------------------------
-Function: UpdateMaxPFeng
-Description: Adjusts the current maximum drop probability using Feng's adaptive MIMD scheme
-Parameters: newAvg - the current EWMA queue length
-Returns: None
-Return Type: void
---------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Adjusts the current maximum drop probability using Feng's adaptive MIMD scheme.
+ *
+ * @param newAvg The current EWMA queue length.
+ */
 
 void
 RedQueueDisc::UpdateMaxPFeng(double newAvg)
@@ -774,16 +763,11 @@ RedQueueDisc::UpdateMaxPFeng(double newAvg)
     }
 }
 
-/*
------------------------------------------------------------------------------------------
-Function: UpdateMaxP
-Description: Adjusts the current maximum drop probability using AIMD rules to keep
-             the average queue length within the target range.
-Parameters: newAvg - the current exponentially weighted average queue length
-Returns: None
-Return Type: void
------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Adjusts the current maximum drop probability using AIMD rules to keep the average queue length within the target range.
+ *
+ * @param newAvg The current exponentially weighted average queue length.
+ */
 
 void
 RedQueueDisc::UpdateMaxP(double newAvg)
@@ -817,18 +801,16 @@ RedQueueDisc::UpdateMaxP(double newAvg)
     }
 }
 
-/*
------------------------------------------------------------------------------------------------
-Function: Estimator
-Description: Computes the new EWMA queue length and triggers adaptive max probability updates
-Parameters: currQLen - current instantaneous queue length
-            m - number of packets arriving since the queue was last updated
-            oldAvg - previous average queue length
-            qWeight - queue weight factor for the EWMA calculation
-Returns: the updated average queue length
-Return Type: double
-------------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Computes the new EWMA queue length and triggers adaptive max probability updates.
+ *
+ * @param currQLen Current instantaneous queue length.
+ * @param m        Number of packets arriving since the queue was last updated.
+ * @param oldAvg   Previous average queue length.
+ * @param qWeight  Queue weight factor for the EWMA calculation.
+ *
+ * @return The updated average queue length.
+ */
 
 double
 RedQueueDisc::Estimator(uint32_t currQLen, uint32_t m, double oldAvg, double qWeight)
@@ -851,17 +833,14 @@ RedQueueDisc::Estimator(uint32_t currQLen, uint32_t m, double oldAvg, double qWe
     return newAvg;
 }
 
-/*
------------------------------------------------------------------------------------------
-Function: DropEarly
-Description: Determines whether an incoming packet should be dropped or marked based
-             on computed drop probability and optional queue caution modes.
-Parameters: item - the incoming packet being evaluated
-            qSize - current instantaneous queue size in bytes
-Returns: true if the packet should be dropped, false otherwise
-Return Type: bool
------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Determines whether an incoming packet should be dropped or marked based on computed drop probability and optional queue caution modes.
+ *
+ * @param item  The incoming packet being evaluated.
+ * @param qSize Current instantaneous queue size in bytes.
+ *
+ * @return True if the packet should be dropped, false otherwise.
+ */
 
 bool
 RedQueueDisc::DropEarly(Ptr<QueueDiscItem> item, uint32_t qSize)
@@ -924,16 +903,11 @@ RedQueueDisc::DropEarly(Ptr<QueueDiscItem> item, uint32_t qSize)
     return false; // no drop/mark
 }
 
-/*
------------------------------------------------------------------------------------------
-Function: CalculatePNew
-Description: Computes the drop probability based on the current average queue size
-             relative to the minimum and maximum thresholds.
-Parameters: None
-Returns: the calculated drop probability 
-Return Type: double
------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Computes the drop probability based on the current average queue size relative to the minimum and maximum thresholds.
+ *
+ * @return The calculated drop probability.
+ */
 
 double
 RedQueueDisc::CalculatePNew()
@@ -984,15 +958,14 @@ RedQueueDisc::CalculatePNew()
     return Pd;
 }
 
-/*
------------------------------------------------------------------------------------------
-Function: ModifyP
-Description: Adjusts the drop probability based on queue count and packet size.
-Parameters: Pd - initial drop probability, size - packet size in bytes
-Returns: drop probability
-Return Type: double
------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Adjusts the drop probability based on queue count and packet size.
+ *
+ * @param Pd   Initial drop probability.
+ * @param size Packet size in bytes.
+ *
+ * @return The adjusted drop probability.
+ */
 
 double
 RedQueueDisc::ModifyP(double Pd, uint32_t size)
@@ -1045,15 +1018,11 @@ RedQueueDisc::ModifyP(double Pd, uint32_t size)
     return Pd;
 }
 
-/*
------------------------------------------------------------------------------------------
-Function: DoDequeue
-Description: Removes and returns the front packet from the internal queue
-Parameters: None
-Returns: the dequeued packet, or nullptr if the queue is empty
-Return Type: Ptr<QueueDiscItem>
------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Removes and returns the front packet from the internal queue.
+ *
+ * @return The dequeued packet, or nullptr if the queue is empty.
+ */
 
 Ptr<QueueDiscItem>
 RedQueueDisc::DoDequeue()
@@ -1082,15 +1051,11 @@ RedQueueDisc::DoDequeue()
     }
 }
 
-/*
------------------------------------------------------------------------------------------
-Function: DoPeek
-Description: Returns the front packet of the internal queue without removing it.
-Parameters: None
-Returns: pointer to front of the queue, or nullptr if the queue is empty
-Return Type: Ptr<const QueueDiscItem>
------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Returns the front packet of the internal queue without removing it.
+ *
+ * @return Pointer to the front of the queue, or nullptr if the queue is empty.
+ */
 
 Ptr<const QueueDiscItem>
 RedQueueDisc::DoPeek()
@@ -1110,15 +1075,11 @@ RedQueueDisc::DoPeek()
     return item;
 }
 
-/*
------------------------------------------------------------------------------------------
-Function: CheckConfig
-Description: Validates the queue disc configuration before the simulation starts.
-Parameters: None
-Returns: true if configuration is valid, false otherwise
-Return Type: bool
------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Validates the queue disc configuration before the simulation starts.
+ *
+ * @return True if the configuration is valid, false otherwise.
+ */
 
 bool
 RedQueueDisc::CheckConfig()
