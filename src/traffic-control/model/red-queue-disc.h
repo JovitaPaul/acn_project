@@ -91,6 +91,7 @@ class RedQueueDisc : public QueueDisc
 
     /**
      * @brief Get the type ID.
+     *
      * @return the object TypeId
      */
     static TypeId GetTypeId();
@@ -111,54 +112,63 @@ class RedQueueDisc : public QueueDisc
 
     /**
      * @brief Set the alpha value to adapt m_curMaxP.
+     *
      * @param alpha The value of alpha to adapt m_curMaxP.
      */
     void SetAredAlpha(double alpha);
 
     /**
      * @brief Get the alpha value to adapt m_curMaxP.
+     *
      * @return The alpha value to adapt m_curMaxP.
      */
     double GetAredAlpha();
 
     /**
      * @brief Set the beta value to adapt m_curMaxP.
+     *
      * @param beta The value of beta to adapt m_curMaxP.
      */
     void SetAredBeta(double beta);
 
     /**
      * @brief Get the beta value to adapt m_curMaxP.
+     *
      * @return The beta value to adapt m_curMaxP.
      */
     double GetAredBeta();
 
     /**
      * @brief Set the alpha value to adapt m_curMaxP in Feng's Adaptive RED.
+     *
      * @param a The value of alpha to adapt m_curMaxP in Feng's Adaptive RED.
      */
     void SetFengAdaptiveA(double a);
 
     /**
      * @brief Get the alpha value to adapt m_curMaxP in Feng's Adaptive RED.
+     *
      * @return The alpha value to adapt m_curMaxP in Feng's Adaptive RED.
      */
     double GetFengAdaptiveA();
 
     /**
      * @brief Set the beta value to adapt m_curMaxP in Feng's Adaptive RED.
+     *
      * @param b The value of beta to adapt m_curMaxP in Feng's Adaptive RED.
      */
     void SetFengAdaptiveB(double b);
 
     /**
      * @brief Get the beta value to adapt m_curMaxP in Feng's Adaptive RED.
+     *
      * @return The beta value to adapt m_curMaxP in Feng's Adaptive RED.
      */
     double GetFengAdaptiveB();
 
     /**
      * @brief Set the thresh limits of RED.
+     *
      * @param minTh Minimum thresh in bytes or packets.
      * @param maxTh Maximum thresh in bytes or packets.
      */
@@ -166,7 +176,9 @@ class RedQueueDisc : public QueueDisc
 
     /**
      * @brief Assign a fixed random variable stream number to the random variables used by this model.
+     *
      * @param stream First stream index to use.
+     *
      * @return The number of stream indices assigned by this model.
      */
     int64_t AssignStreams(int64_t stream);
