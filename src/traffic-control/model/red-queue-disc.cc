@@ -284,15 +284,13 @@ RedQueueDisc::~RedQueueDisc()
     NS_LOG_FUNCTION(this);
 }
 
-/*
------------------------------------------------------------------------------------------
-Function: DoDispose
-Description: Releases the random variable stream and delegates cleanup to the base class.
-Parameters: None
-Returns: None
-Return Type: void
------------------------------------------------------------------------------------------
-*/
+/**
+ * @brief Releases the random variable stream and delegates cleanup to the base class.
+ *
+ * @param None
+ *
+ * @return void
+ */
 
 void
 RedQueueDisc::DoDispose()
