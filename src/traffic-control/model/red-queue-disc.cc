@@ -890,7 +890,7 @@ RedQueueDisc::DropEarly(Ptr<QueueDiscItem> item, uint32_t qSize)
 
     if (R <= m_Pa)
     {
-        NS_LOG_LOGIC("u <= m_Pa; R " << R << "; m_Pa " << m_Pa);
+        NS_LOG_LOGIC("R <= m_Pa; R " << R << "; m_Pa " << m_Pa);
 
         // DROP or MARK
         m_count = 0;
