@@ -183,10 +183,10 @@ class RedQueueDisc : public QueueDisc
      */
     int64_t AssignStreams(int64_t stream);
 
-    // Reasons for dropping packets
+    //!< Reasons for dropping packets
     static constexpr const char* UNFORCED_DROP = "Unforced drop"; //!< Early probability drops
     static constexpr const char* FORCED_DROP = "Forced drop";     //!< Forced drops, m_qAvg > m_maxTh
-    // Reasons for marking packets
+    //!< Reasons for marking packets
     static constexpr const char* UNFORCED_MARK = "Unforced mark"; //!< Early probability marks
     static constexpr const char* FORCED_MARK = "Forced mark";     //!< Forced marks, m_qAvg > m_maxTh
 
@@ -197,26 +197,26 @@ class RedQueueDisc : public QueueDisc
     void DoDispose() override;
 
   private:
-    // ** Core queue operations
+    //!< Core queue operations
     bool DoEnqueue(Ptr<QueueDiscItem> item) override;
     Ptr<QueueDiscItem> DoDequeue() override;
     Ptr<const QueueDiscItem> DoPeek() override;
     bool CheckConfig() override;
     void InitializeParams() override;
 
-    // ** Queue average estimation
+    //!< Queue average estimation
     double Estimator(uint32_t currQLen, uint32_t m, double oldavg, double wQ);
 
-    // ** Drop probability computation
+    //!< Drop probability computation
     double CalculatePNew();
     double ModifyP(double p, uint32_t size);
     bool DropEarly(Ptr<QueueDiscItem> item, uint32_t qSize);
 
-    // ** Max drop probability adaptation
+    //!< Max drop probability adaptation
     void UpdateMaxP(double newAvg);
     void UpdateMaxPFeng(double newAvg);
 
-    // ** Variables supplied by user
+    //!< Variables supplied by user
     uint32_t m_meanPktSize;   //!< Avg pkt size
     uint32_t m_idleQPktSize;  //!< Avg pkt size used during idle times
     bool m_isWait;            //!< True for waiting between dropped packets
@@ -255,20 +255,20 @@ class RedQueueDisc : public QueueDisc
     uint32_t m_cautionMode;
     Time m_idleTime;         //!< Start of current idle period
 
-    // ** Variables maintained by Gentle RED
+    //!< Variables maintained by Gentle RED
     double m_vC; //!< (1.0 - m_curMaxP) / m_maxTh - used in "gentle" mode
     double m_vD; //!< 2.0 * m_curMaxP - 1.0 - used in "gentle" mode
 
-    // ** Variables maintained by Nonlinear RED (NLRED)
+    //!< Variables maintained by Nonlinear RED (NLRED)
     // (m_isNonlinear flag above gates this path; probability shaping is done
     //  entirely inside CalculatePNew() / ModifyP() with no extra state fields)
 
-    // ** Variables maintained by Feng's Adaptive RED
+    //!< Variables maintained by Feng's Adaptive RED
     double m_fengAlpha;      //!< Decrement parameter for m_curMaxP in Feng's Adaptive RED
     double m_fengBeta;       //!< Increment parameter for m_curMaxP in Feng's Adaptive RED
     FengStatus m_fengStatus; //!< Tracks queue state (Above / Between / Below thresholds)
 
-    // ** Variables maintained by Adaptive RED (ARED)
+    //!< Variables maintained by Adaptive RED (ARED)
     Time m_targetQDelay;    //!< Target average queuing delay in ARED
     Time m_interval;            //!< Time interval to update m_curMaxP
     double m_minCurMaxP;         //!< Lower bound for m_curMaxP in ARED
